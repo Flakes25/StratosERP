@@ -1,0 +1,500 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<title>StratosERP</title>
+
+<link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+```
+
+</head>
+
+<body>
+
+<!-- NAVIGATION -->
+
+<header class="navbar">
+
+```
+<a href="/" class="logo">
+    STRATOS<span>ERP</span>
+</a>
+
+<nav class="nav-links">
+    <a href="#operations">Operations</a>
+    <a href="#telemetry">Telemetry</a>
+    <a href="#activity">Activity</a>
+    <a href="#status">System</a>
+</nav>
+
+<a href="#operations" class="nav-button">
+    ENTER SYSTEM
+</a>
+```
+
+</header>
+
+<!-- HERO -->
+
+<section class="hero">
+
+```
+<div class="hero-image"></div>
+
+<div class="hero-overlay"></div>
+
+<div class="hero-content">
+
+    <p class="eyebrow">
+        ENTERPRISE RESOURCE PLATFORM
+    </p>
+
+    <h1>
+        STRATOS<span>ERP</span>
+    </h1>
+
+    <p class="hero-description">
+        A centralized platform for resource planning,
+        inventory management and hardware telemetry.
+    </p>
+
+    <div class="hero-actions">
+
+        <a href="#operations" class="primary-button">
+            EXPLORE SYSTEM
+            <span>→</span>
+        </a>
+
+        <div class="system-state">
+            <span class="online-dot"></span>
+            SYSTEM ONLINE
+        </div>
+
+    </div>
+
+</div>
+
+<div class="scroll-indicator">
+    SCROLL TO EXPLORE
+    <span>↓</span>
+</div>
+```
+
+</section>
+
+<!-- OPERATIONS -->
+
+<section class="section operations" id="operations">
+
+```
+<div class="section-heading">
+
+    <div>
+        <p class="eyebrow">01 / OPERATIONS</p>
+
+        <h2>
+            Everything<br>
+            <em>in one system.</em>
+        </h2>
+    </div>
+
+    <p class="section-intro">
+        Manage the resources that keep your organization
+        operating from one centralized platform.
+    </p>
+
+</div>
+
+
+<div class="feature-grid">
+
+    <!-- RESOURCES -->
+    <a href="#" class="feature-card feature-large">
+
+        <div class="feature-image resources-image"></div>
+
+        <div class="feature-overlay"></div>
+
+        <div class="feature-content">
+
+            <span class="feature-number">01</span>
+
+            <div>
+                <p class="feature-label">MANAGEMENT</p>
+
+                <h3>Resources</h3>
+
+                <p>
+                    Organize and monitor organizational
+                    resources in one centralized system.
+                </p>
+            </div>
+
+            <span class="feature-arrow">↗</span>
+
+        </div>
+
+    </a>
+
+
+    <!-- INVENTORY -->
+    <a href="#" class="feature-card">
+
+        <div class="feature-image inventory-image"></div>
+
+        <div class="feature-overlay"></div>
+
+        <div class="feature-content">
+
+            <span class="feature-number">02</span>
+
+            <div>
+                <p class="feature-label">ASSET CONTROL</p>
+
+                <h3>Inventory</h3>
+
+                <p>
+                    Track equipment, supplies and
+                    available assets.
+                </p>
+            </div>
+
+            <span class="feature-arrow">↗</span>
+
+        </div>
+
+    </a>
+
+
+    <!-- HARDWARE -->
+    <a href="#" class="feature-card">
+
+        <div class="feature-image hardware-image"></div>
+
+        <div class="feature-overlay"></div>
+
+        <div class="feature-content">
+
+            <span class="feature-number">03</span>
+
+            <div>
+                <p class="feature-label">INFRASTRUCTURE</p>
+
+                <h3>Hardware</h3>
+
+                <p>
+                    Register and monitor connected
+                    computing infrastructure.
+                </p>
+            </div>
+
+            <span class="feature-arrow">↗</span>
+
+        </div>
+
+    </a>
+
+</div>
+```
+
+</section>
+
+<!-- TELEMETRY -->
+
+<section class="telemetry-section" id="telemetry">
+
+```
+<div class="telemetry-background"></div>
+
+<div class="telemetry-overlay"></div>
+
+<div class="telemetry-content">
+
+    <div class="telemetry-heading">
+
+        <p class="eyebrow">
+            02 / HARDWARE TELEMETRY
+        </p>
+
+        <h2>
+            Know what's<br>
+            <em>happening.</em>
+        </h2>
+
+        <p>
+            Monitor connected hardware and infrastructure
+            through centralized telemetry data.
+        </p>
+
+        <a href="#" class="outline-button">
+            VIEW TELEMETRY
+            <span>→</span>
+        </a>
+
+    </div>
+
+
+    <div class="telemetry-stats">
+
+        <div class="telemetry-stat">
+
+            <span class="stat-label">
+                HARDWARE NODES
+            </span>
+
+            <strong>00</strong>
+
+            <span class="stat-status">
+                REGISTERED
+            </span>
+
+        </div>
+
+
+        <div class="telemetry-stat">
+
+            <span class="stat-label">
+                ACTIVE NODES
+            </span>
+
+            <strong>00</strong>
+
+            <span class="stat-status online">
+                ONLINE
+            </span>
+
+        </div>
+
+
+        <div class="telemetry-stat">
+
+            <span class="stat-label">
+                ALERTS
+            </span>
+
+            <strong>00</strong>
+
+            <span class="stat-status">
+                NO ALERTS
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+```
+
+</section>
+
+<!-- ACTIVITY -->
+
+<section class="section activity-section" id="activity">
+
+```
+<div class="section-heading">
+
+    <div>
+        <p class="eyebrow">03 / SYSTEM ACTIVITY</p>
+
+        <h2>
+            What's<br>
+            <em>happening.</em>
+        </h2>
+    </div>
+
+    <p class="section-intro">
+        Recent events and system activity across
+        your StratosERP environment.
+    </p>
+
+</div>
+
+
+<div class="activity-list">
+
+    <div class="activity-row">
+
+        <div class="activity-index">
+            01
+        </div>
+
+        <div class="activity-main">
+            <span>SYSTEM</span>
+            <h3>StratosERP initialized</h3>
+        </div>
+
+        <div class="activity-info">
+            System is ready for operation.
+        </div>
+
+        <div class="activity-time">
+            NOW
+        </div>
+
+    </div>
+
+
+    <div class="activity-row">
+
+        <div class="activity-index">
+            02
+        </div>
+
+        <div class="activity-main">
+            <span>INVENTORY</span>
+            <h3>No recent inventory activity</h3>
+        </div>
+
+        <div class="activity-info">
+            Inventory records will appear here.
+        </div>
+
+        <div class="activity-time">
+            —
+        </div>
+
+    </div>
+
+
+    <div class="activity-row">
+
+        <div class="activity-index">
+            03
+        </div>
+
+        <div class="activity-main">
+            <span>TELEMETRY</span>
+            <h3>Waiting for hardware nodes</h3>
+        </div>
+
+        <div class="activity-info">
+            Hardware telemetry will appear here.
+        </div>
+
+        <div class="activity-time">
+            —
+        </div>
+
+    </div>
+
+</div>
+```
+
+</section>
+
+<!-- SYSTEM STATUS -->
+
+<section class="status-section" id="status">
+
+```
+<div class="status-container">
+
+    <div class="status-heading">
+
+        <p class="eyebrow">
+            04 / SYSTEM
+        </p>
+
+        <h2>
+            System<br>
+            <em>status.</em>
+        </h2>
+
+    </div>
+
+
+    <div class="status-list">
+
+        <div class="status-item">
+
+            <div>
+                <span>APPLICATION</span>
+                <strong>Django Application</strong>
+            </div>
+
+            <div class="status-online">
+                <span></span>
+                ONLINE
+            </div>
+
+        </div>
+
+
+        <div class="status-item">
+
+            <div>
+                <span>DATABASE</span>
+                <strong>Database Connection</strong>
+            </div>
+
+            <div class="status-online">
+                <span></span>
+                ONLINE
+            </div>
+
+        </div>
+
+
+        <div class="status-item">
+
+            <div>
+                <span>TELEMETRY</span>
+                <strong>Hardware Monitoring</strong>
+            </div>
+
+            <div class="status-ready">
+                READY
+            </div>
+
+        </div>
+
+
+        <div class="status-item">
+
+            <div>
+                <span>STORAGE</span>
+                <strong>System Storage</strong>
+            </div>
+
+            <div class="status-ready">
+                READY
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+```
+
+</section>
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+```
+<div class="footer-logo">
+    STRATOS<span>ERP</span>
+</div>
+
+<p>
+    Resource Planning & Hardware Telemetry System
+</p>
+
+<p>
+    VERSION 0.1.0
+</p>
+```
+
+</footer>
+
+</body>
+</html>
