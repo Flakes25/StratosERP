@@ -1,0 +1,408 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StratosERP{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <style>
+:root {
+    --red: #ff6b6b;
+    --amber: #f2b84b;
+    --blue: #6cb8ff;
+    --panel: #0f0f0f;
+}
+
+/* ---------- layout ---------- */
+main.page { padding: 140px 9% 100px; min-height: 70vh; }
+main.login-wrap { min-height: 100vh; display: grid; place-items: center; padding: 110px 24px 50px; }
+
+.page-heading {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 30px; flex-wrap: wrap; margin-bottom: 50px;
+}
+.page-heading h2 {
+    margin-top: 15px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(48px, 6vw, 84px);
+    font-weight: 600; line-height: 0.88; text-transform: uppercase;
+}
+.toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.toolbar .outline-button, .toolbar .primary-button, .form-actions .outline-button { margin-top: 0; }
+.search-form { display: flex; gap: 10px; align-items: center; }
+.search-form .form-control { width: 240px; }
+.block-title {
+    margin: 60px 0 18px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px; font-weight: 500; text-transform: uppercase;
+}
+
+/* ---------- navbar additions ---------- */
+.nav-links { gap: 26px; flex-wrap: nowrap; }
+.navbar .logout-form { margin: 0; }
+button.nav-button, button.primary-button, button.outline-button, button.mini-button {
+    font-family: inherit; cursor: pointer;
+}
+button.nav-button { background: transparent; color: #fff; }
+button.nav-button:hover { color: #000; }
+button.primary-button { border: 0; }
+button.outline-button { background: transparent; color: #fff; }
+button.outline-button:hover { color: #000; }
+.primary-button { gap: 20px; }
+.primary-button.danger { background: var(--red); color: #000; }
+
+/* ---------- flash messages ---------- */
+.messages { position: fixed; top: 105px; right: 30px; z-index: 50; display: grid; gap: 8px; width: min(360px, calc(100vw - 40px)); }
+.msg {
+    padding: 14px 18px; background: #101010; color: #ddd;
+    border: 1px solid var(--line); border-left: 3px solid var(--blue);
+    font-size: 12px; line-height: 1.5;
+}
+.msg.success { border-left-color: var(--green); }
+.msg.error { border-left-color: var(--red); }
+.msg.warning { border-left-color: var(--amber); }
+
+/* ---------- tables ---------- */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th, .data-table td { padding: 18px 20px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.data-table th { color: #777; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+.data-table td { color: #ddd; }
+.data-table tbody tr { transition: background 0.3s; }
+.data-table tbody tr:hover { background: #101010; }
+.data-table tbody tr:last-child td { border-bottom: 0; }
+.data-table .empty { padding: 60px 20px; color: #777; text-align: center; white-space: normal; }
+.row-actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+.row-actions form { margin: 0; }
+
+.badge {
+    display: inline-block; padding: 4px 10px; border: 1px solid var(--line);
+    color: #aaa; font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+}
+.badge.good { color: var(--green); border-color: rgba(110, 229, 139, 0.45); }
+.badge.warn { color: var(--amber); border-color: rgba(242, 184, 75, 0.45); }
+.badge.bad  { color: var(--red);   border-color: rgba(255, 107, 107, 0.45); }
+.badge.info { color: var(--blue);  border-color: rgba(108, 184, 255, 0.45); }
+
+.mini-button {
+    display: inline-block; padding: 8px 12px; background: transparent; color: #bbb;
+    border: 1px solid var(--line); font-size: 9px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; transition: 0.3s;
+}
+.mini-button:hover { background: #fff; color: #000; border-color: #fff; }
+.mini-button.good { color: var(--green); }
+.mini-button.bad  { color: var(--red); }
+.mini-button.info { color: var(--blue); }
+.mini-button.good:hover, .mini-button.bad:hover, .mini-button.info:hover { color: #000; }
+
+/* ---------- forms ---------- */
+.form-control {
+    width: 100%; padding: 13px 14px; background: #0b0b0b; color: #fff;
+    border: 1px solid var(--line); border-radius: 0;
+    font-family: 'Inter', Arial, sans-serif; font-size: 13px; color-scheme: dark;
+}
+.form-control:focus { outline: none; border-color: #fff; }
+textarea.form-control { resize: vertical; }
+.form-card { max-width: 640px; padding: 40px; border: 1px solid var(--line); background: var(--panel); color: #ccc; font-size: 13px; line-height: 1.8; }
+.form-card strong { color: #fff; }
+.field { margin-bottom: 22px; }
+.field label { display: block; margin-bottom: 8px; color: #777; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+.field small { display: block; margin-top: 6px; color: #666; font-size: 11px; }
+.errorlist { margin: 8px 0 0; padding: 0; list-style: none; color: var(--red); font-size: 12px; }
+.form-error { margin-bottom: 22px; padding: 14px 16px; border: 1px solid rgba(255, 107, 107, 0.45); color: var(--red); font-size: 12px; }
+.form-error .errorlist { margin: 0; }
+.form-actions { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; align-items: center; }
+.login-card { width: 100%; max-width: 420px; }
+.login-card h2 {
+    margin: 15px 0 30px; color: #fff;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 600; line-height: 0.9; text-transform: uppercase;
+}
+
+/* ---------- KPI tiles ---------- */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin-bottom: 20px; }
+.kpi-grid.glance { margin-top: 14px; }
+.kpi { display: flex; flex-direction: column; gap: 12px; padding: 26px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transition: background 0.3s; }
+a.kpi:hover { background: #101010; }
+.kpi strong { font-family: 'Barlow Condensed', sans-serif; font-size: 55px; font-weight: 500; line-height: 0.9; }
+.kpi span { color: #777; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+
+/* ---------- usage bars ---------- */
+.meter { display: flex; align-items: center; gap: 12px; min-width: 170px; }
+.meter em { min-width: 40px; color: #aaa; font-style: normal; font-size: 11px; }
+.bar { flex: 1; height: 4px; background: rgba(255, 255, 255, 0.12); }
+.bar span { display: block; height: 100%; background: var(--green); }
+.bar.warn span { background: var(--amber); }
+.bar.bad span { background: var(--red); }
+
+/* ---------- reports ---------- */
+.export-row { margin-bottom: 10px; }
+.report-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); column-gap: 40px; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+    main.page { padding: 170px 6% 80px; }
+    /* style.css hides .nav-links here; inner pages need it, so show it as a scrolling row */
+    .nav-links {
+        display: flex; position: absolute; top: 90px; left: 0; right: 0;
+        gap: 24px; padding: 14px 25px; overflow-x: auto; white-space: nowrap;
+        background: #090909; border-bottom: 1px solid var(--line);
+    }
+    .search-form .form-control { width: 100%; }
+    .search-form { width: 100%; }
+    .page-heading { margin-bottom: 36px; }
+}
+
+@media (max-width: 600px) {
+    .nav-links { top: 70px; }
+    /* style.css hides .nav-button here; keep log out reachable */
+    button.nav-button { display: inline-block; padding: 10px 12px; }
+    .messages { top: 130px; right: 20px; }
+    .form-card { padding: 28px 22px; }
+}
+
+/* ---------- interactions ---------- */
+[hidden] { display: none !important; }
+.msg { transition: opacity 0.5s; }
+.msg.fade { opacity: 0; }
+.form-control.invalid { border-color: var(--red); }
+.show-pass { display: flex; gap: 8px; align-items: center; margin-top: -6px; color: #aaa; font-size: 12px; cursor: pointer; }
+.live-note { display: flex; gap: 8px; align-items: center; margin-top: 14px; color: #777; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+
+.confirm-dialog {
+    margin: auto; padding: 36px; width: calc(100vw - 40px); max-width: 440px;
+    background: #0f0f0f; color: #ccc; border: 1px solid var(--line);
+}
+.confirm-dialog::backdrop { background: rgba(0, 0, 0, 0.72); }
+.confirm-dialog h3 {
+    margin-bottom: 12px; color: #fff;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 500; text-transform: uppercase;
+}
+.confirm-dialog p { font-size: 13px; line-height: 1.8; }
+.confirm-dialog .form-actions { margin-top: 24px; }
+
+/* ---------- all modules page ---------- */
+.module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.module-tile { display: flex; flex-direction: column; gap: 10px; min-height: 180px; padding: 28px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transition: background 0.3s; }
+.module-tile:hover { background: #101010; }
+.module-tile h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 500; line-height: 0.95; text-transform: uppercase; }
+.module-tile p { flex: 1; color: #777; font-size: 12px; line-height: 1.7; }
+.tile-links { display: flex; gap: 8px; }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<header class="navbar">
+    <a href="{% url 'dashboard' %}" class="logo">STRATOS<span>ERP</span></a>
+
+    {% if user.is_authenticated %}
+    <nav class="nav-links">
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        {% if can_view.inventory %}<a href="{% url 'inventory_list' %}">Inventory</a>{% endif %}
+        {% if can_view.procurement %}<a href="{% url 'procurement_list' %}">Procurement</a>{% endif %}
+        {% if can_view.assignments %}<a href="{% url 'assignments_list' %}">Assignments</a>{% endif %}
+        {% if can_view.employees %}<a href="{% url 'employees_list' %}">Employees</a>{% endif %}
+        {% if can_view.telemetry %}<a href="{% url 'telemetry' %}">Telemetry</a>{% endif %}
+        {% if can_view.reports %}<a href="{% url 'reports' %}">Reports</a>{% endif %}
+        <a href="{% url 'modules' %}">All modules</a>
+    </nav>
+
+    <form method="post" action="{% url 'logout' %}" class="logout-form">
+        {% csrf_token %}
+        <button type="submit" class="nav-button" title="{{ user_roles|join:', ' }}">Log out ({{ user.username }})</button>
+    </form>
+    {% endif %}
+</header>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="msg {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main class="{% block main_class %}page{% endblock %}">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+    <div class="footer-logo">STRATOS<span>ERP</span></div>
+    <p>Resource Planning &amp; Hardware Telemetry System</p>
+    <p>VERSION 0.2.0</p>
+</footer>
+
+<dialog id="confirm-dialog" class="confirm-dialog">
+    <form method="dialog">
+        <h3 id="confirm-title">Please confirm</h3>
+        <p id="confirm-text"></p>
+        <div class="form-actions">
+            <button type="submit" value="ok" id="confirm-ok" class="primary-button">Confirm</button>
+            <button type="submit" value="cancel" class="outline-button">Cancel</button>
+        </div>
+    </form>
+</dialog>
+
+<script>
+(function () {
+    // ----- confirm dialog (falls back to the browser's confirm() if <dialog> is unsupported)
+    var dlg = document.getElementById("confirm-dialog");
+    function ask(title, text, okLabel, danger, onYes) {
+        if (!dlg || typeof dlg.showModal !== "function") {
+            if (window.confirm(text)) onYes();
+            return;
+        }
+        document.getElementById("confirm-title").textContent = title;
+        document.getElementById("confirm-text").textContent = text;
+        var ok = document.getElementById("confirm-ok");
+        ok.textContent = okLabel;
+        ok.className = "primary-button" + (danger ? " danger" : "");
+        dlg.returnValue = "";
+        dlg.addEventListener("close", function handler() {
+            dlg.removeEventListener("close", handler);
+            if (dlg.returnValue === "ok") onYes();
+        });
+        dlg.showModal();
+    }
+
+    // Row actions (approve, reject, return, mark received) ask first
+    document.addEventListener("submit", function (e) {
+        var form = e.target, msg = form.getAttribute && form.getAttribute("data-confirm");
+        if (!msg || form.dataset.confirmed) return;
+        e.preventDefault();
+        ask("Please confirm", msg, "Confirm", false, function () {
+            form.dataset.confirmed = "1";
+            form.submit();
+        });
+    });
+
+    // Delete buttons open the dialog; without JS they still go to the confirm page
+    document.addEventListener("click", function (e) {
+        var link = e.target.closest && e.target.closest('a.mini-button.bad[href$="/delete/"]');
+        if (!link) return;
+        var token = document.querySelector('input[name="csrfmiddlewaretoken"]');
+        if (!token) return;
+        e.preventDefault();
+        var row = link.closest("tr"), label = "this record";
+        if (row && row.cells.length > 1) {
+            label = row.cells[0].textContent.trim() + " / " + row.cells[1].textContent.trim();
+        }
+        ask("Delete record", "Delete " + label + "? This can't be undone.", "Delete", true, function () {
+            var form = document.createElement("form");
+            form.method = "post";
+            form.action = link.href;
+            form.appendChild(token.cloneNode());
+            document.body.appendChild(form);
+            form.submit();
+        });
+    });
+
+    // ----- live search: filters the table while you type
+    var box = document.querySelector('.search-form input[name="q"]');
+    var table = document.querySelector(".data-table");
+    if (box && table && table.tBodies[0]) {
+        var body = table.tBodies[0];
+        var rows = [].slice.call(body.rows).filter(function (r) { return !r.querySelector(".empty"); });
+        var none = document.createElement("tr");
+        none.hidden = true;
+        none.innerHTML = '<td class="empty" colspan="' + table.tHead.rows[0].cells.length + '">No rows match what you typed.</td>';
+        body.appendChild(none);
+        box.addEventListener("input", function () {
+            var q = box.value.toLowerCase().trim(), shown = 0;
+            rows.forEach(function (r) {
+                var hit = !q || r.textContent.toLowerCase().indexOf(q) > -1;
+                r.hidden = !hit;
+                if (hit) shown++;
+            });
+            none.hidden = shown > 0 || rows.length === 0;
+        });
+    }
+
+    // ----- form validation hints (inline, per field)
+    [].forEach.call(document.querySelectorAll("form.form-card[novalidate]"), function (form) {
+        function clear(field) {
+            var old = field.parentNode.querySelector(".js-error");
+            if (old) old.remove();
+            field.classList.remove("invalid");
+        }
+        function show(field) {
+            clear(field);
+            var list = document.createElement("ul"), li = document.createElement("li");
+            list.className = "errorlist js-error";
+            li.textContent = field.validationMessage;
+            list.appendChild(li);
+            field.parentNode.appendChild(list);
+            field.classList.add("invalid");
+        }
+        form.addEventListener("submit", function (e) {
+            var first = null;
+            [].forEach.call(form.elements, function (f) {
+                if (!f.willValidate) return;
+                clear(f);
+                if (!f.checkValidity()) { show(f); first = first || f; }
+            });
+            if (first) { e.preventDefault(); first.focus(); }
+        });
+        form.addEventListener("input", function (e) { clear(e.target); });
+        form.addEventListener("blur", function (e) {
+            var f = e.target;
+            if (f.willValidate && f.value !== "" && !f.checkValidity()) show(f);
+        }, true);
+    });
+
+    // ----- assignment form: cap the quantity at what is in stock
+    var item = document.getElementById("id_item"), qty = document.getElementById("id_quantity");
+    if (item && qty && document.getElementById("id_employee")) {
+        var hint = document.createElement("small");
+        qty.parentNode.appendChild(hint);
+        var sync = function () {
+            var opt = item.options[item.selectedIndex];
+            var m = /(\d+) in stock/.exec(opt ? opt.text : "");
+            if (m) {
+                qty.max = m[1];
+                hint.textContent = "Up to " + m[1] + " available";
+                if (+qty.value > +m[1]) qty.value = m[1];
+            } else {
+                qty.removeAttribute("max");
+                hint.textContent = "";
+            }
+        };
+        item.addEventListener("change", sync);
+        sync();
+    }
+
+    // ----- login: show / hide password
+    var toggle = document.getElementById("show-pass"), pass = document.getElementById("id_password");
+    if (toggle && pass) {
+        toggle.addEventListener("change", function () { pass.type = toggle.checked ? "text" : "password"; });
+    }
+
+    // ----- flash messages fade out
+    [].forEach.call(document.querySelectorAll(".messages .msg"), function (m, i) {
+        setTimeout(function () {
+            m.classList.add("fade");
+            setTimeout(function () { m.remove(); }, 500);
+        }, 5000 + i * 600);
+    });
+
+    // ----- telemetry page refreshes itself
+    [].forEach.call(document.querySelectorAll("[data-autorefresh]"), function (box) {
+        var ms = parseInt(box.getAttribute("data-autorefresh"), 10) || 15000;
+        setInterval(function () {
+            if (document.hidden) return;
+            fetch(window.location.href, { credentials: "same-origin" })
+                .then(function (r) { return r.ok ? r.text() : null; })
+                .then(function (html) {
+                    if (!html) return;
+                    var doc = new DOMParser().parseFromString(html, "text/html");
+                    var fresh = doc.querySelector("[data-autorefresh]");
+                    if (fresh) box.innerHTML = fresh.innerHTML;
+                })
+                .catch(function () {});
+        }, ms);
+    });
+})();
+</script>
+
+</body>
+</html>

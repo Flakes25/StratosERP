@@ -774,3 +774,164 @@ a {
         display: none;
     }
 }
+
+/* ============================================================
+   INNER PAGES
+   Lists, forms, reports, telemetry and login.
+   Kept below the dashboard rules on purpose: a few rules here
+   override the navbar behaviour from the responsive section above.
+============================================================ */
+
+:root {
+    --red: #ff6b6b;
+    --amber: #f2b84b;
+    --blue: #6cb8ff;
+    --panel: #0f0f0f;
+}
+
+/* ---------- layout ---------- */
+main.page { padding: 140px 9% 100px; min-height: 70vh; }
+main.login-wrap { min-height: 100vh; display: grid; place-items: center; padding: 110px 24px 50px; }
+
+.page-heading {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 30px; flex-wrap: wrap; margin-bottom: 50px;
+}
+.page-heading h2 {
+    margin-top: 15px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(48px, 6vw, 84px);
+    font-weight: 600; line-height: 0.88; text-transform: uppercase;
+}
+.toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.toolbar .outline-button, .toolbar .primary-button, .form-actions .outline-button { margin-top: 0; }
+.search-form { display: flex; gap: 10px; align-items: center; }
+.search-form .form-control { width: 240px; }
+.block-title {
+    margin: 60px 0 18px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px; font-weight: 500; text-transform: uppercase;
+}
+
+/* ---------- navbar additions ---------- */
+.nav-links { gap: 26px; flex-wrap: nowrap; }
+.navbar .logout-form { margin: 0; }
+button.nav-button, button.primary-button, button.outline-button, button.mini-button {
+    font-family: inherit; cursor: pointer;
+}
+button.nav-button { background: transparent; color: #fff; }
+button.nav-button:hover { color: #000; }
+button.primary-button { border: 0; }
+button.outline-button { background: transparent; color: #fff; }
+button.outline-button:hover { color: #000; }
+.primary-button { gap: 20px; }
+.primary-button.danger { background: var(--red); color: #000; }
+
+/* ---------- flash messages ---------- */
+.messages { position: fixed; top: 105px; right: 30px; z-index: 50; display: grid; gap: 8px; width: min(360px, calc(100vw - 40px)); }
+.msg {
+    padding: 14px 18px; background: #101010; color: #ddd;
+    border: 1px solid var(--line); border-left: 3px solid var(--blue);
+    font-size: 12px; line-height: 1.5;
+}
+.msg.success { border-left-color: var(--green); }
+.msg.error { border-left-color: var(--red); }
+.msg.warning { border-left-color: var(--amber); }
+
+/* ---------- tables ---------- */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th, .data-table td { padding: 18px 20px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.data-table th { color: #777; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+.data-table td { color: #ddd; }
+.data-table tbody tr { transition: background 0.3s; }
+.data-table tbody tr:hover { background: #101010; }
+.data-table tbody tr:last-child td { border-bottom: 0; }
+.data-table .empty { padding: 60px 20px; color: #777; text-align: center; white-space: normal; }
+.row-actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+.row-actions form { margin: 0; }
+
+.badge {
+    display: inline-block; padding: 4px 10px; border: 1px solid var(--line);
+    color: #aaa; font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+}
+.badge.good { color: var(--green); border-color: rgba(110, 229, 139, 0.45); }
+.badge.warn { color: var(--amber); border-color: rgba(242, 184, 75, 0.45); }
+.badge.bad  { color: var(--red);   border-color: rgba(255, 107, 107, 0.45); }
+.badge.info { color: var(--blue);  border-color: rgba(108, 184, 255, 0.45); }
+
+.mini-button {
+    display: inline-block; padding: 8px 12px; background: transparent; color: #bbb;
+    border: 1px solid var(--line); font-size: 9px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; transition: 0.3s;
+}
+.mini-button:hover { background: #fff; color: #000; border-color: #fff; }
+.mini-button.good { color: var(--green); }
+.mini-button.bad  { color: var(--red); }
+.mini-button.info { color: var(--blue); }
+.mini-button.good:hover, .mini-button.bad:hover, .mini-button.info:hover { color: #000; }
+
+/* ---------- forms ---------- */
+.form-control {
+    width: 100%; padding: 13px 14px; background: #0b0b0b; color: #fff;
+    border: 1px solid var(--line); border-radius: 0;
+    font-family: 'Inter', Arial, sans-serif; font-size: 13px; color-scheme: dark;
+}
+.form-control:focus { outline: none; border-color: #fff; }
+textarea.form-control { resize: vertical; }
+.form-card { max-width: 640px; padding: 40px; border: 1px solid var(--line); background: var(--panel); color: #ccc; font-size: 13px; line-height: 1.8; }
+.form-card strong { color: #fff; }
+.field { margin-bottom: 22px; }
+.field label { display: block; margin-bottom: 8px; color: #777; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+.field small { display: block; margin-top: 6px; color: #666; font-size: 11px; }
+.errorlist { margin: 8px 0 0; padding: 0; list-style: none; color: var(--red); font-size: 12px; }
+.form-error { margin-bottom: 22px; padding: 14px 16px; border: 1px solid rgba(255, 107, 107, 0.45); color: var(--red); font-size: 12px; }
+.form-error .errorlist { margin: 0; }
+.form-actions { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; align-items: center; }
+.login-card { width: 100%; max-width: 420px; }
+.login-card h2 {
+    margin: 15px 0 30px; color: #fff;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 600; line-height: 0.9; text-transform: uppercase;
+}
+
+/* ---------- KPI tiles ---------- */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin-bottom: 20px; }
+.kpi-grid.glance { margin-top: 14px; }
+.kpi { display: flex; flex-direction: column; gap: 12px; padding: 26px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transition: background 0.3s; }
+a.kpi:hover { background: #101010; }
+.kpi strong { font-family: 'Barlow Condensed', sans-serif; font-size: 55px; font-weight: 500; line-height: 0.9; }
+.kpi span { color: #777; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+
+/* ---------- usage bars ---------- */
+.meter { display: flex; align-items: center; gap: 12px; min-width: 170px; }
+.meter em { min-width: 40px; color: #aaa; font-style: normal; font-size: 11px; }
+.bar { flex: 1; height: 4px; background: rgba(255, 255, 255, 0.12); }
+.bar span { display: block; height: 100%; background: var(--green); }
+.bar.warn span { background: var(--amber); }
+.bar.bad span { background: var(--red); }
+
+/* ---------- reports ---------- */
+.export-row { margin-bottom: 10px; }
+.report-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); column-gap: 40px; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+    main.page { padding: 170px 6% 80px; }
+    /* style.css hides .nav-links here; inner pages need it, so show it as a scrolling row */
+    .nav-links {
+        display: flex; position: absolute; top: 90px; left: 0; right: 0;
+        gap: 24px; padding: 14px 25px; overflow-x: auto; white-space: nowrap;
+        background: #090909; border-bottom: 1px solid var(--line);
+    }
+    .search-form .form-control { width: 100%; }
+    .search-form { width: 100%; }
+    .page-heading { margin-bottom: 36px; }
+}
+
+@media (max-width: 600px) {
+    .nav-links { top: 70px; }
+    /* style.css hides .nav-button here; keep log out reachable */
+    button.nav-button { display: inline-block; padding: 10px 12px; }
+    .messages { top: 130px; right: 20px; }
+    .form-card { padding: 28px 22px; }
+}

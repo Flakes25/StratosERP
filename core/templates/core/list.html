@@ -1,0 +1,63 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ title }} | StratosERP{% endblock %}
+
+{% block content %}
+<section class="page-section">
+
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">{{ eyebrow }}</p>
+            <h2>{{ title }}</h2>
+        </div>
+
+        <div class="toolbar">
+            {% if search %}
+            <form method="get" class="search-form">
+                <input type="search" name="q" value="{{ q }}" class="form-control" autocomplete="off" placeholder="Search {{ title|lower }}">
+                <button type="submit" class="outline-button">Search</button>
+            </form>
+            {% endif %}
+            {% if export_url %}<a href="{{ export_url }}" class="outline-button">Export CSV</a>{% endif %}
+            {% if can_create %}<a href="{{ create_url }}" class="primary-button">Add new</a>{% endif %}
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    {% for column in columns %}<th>{{ column }}</th>{% endfor %}
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    {% for cell in row.cells %}
+                    <td>{% if cell.tone %}<span class="badge {{ cell.tone }}">{{ cell }}</span>{% else %}{{ cell }}{% endif %}</td>
+                    {% endfor %}
+                    <td class="row-actions">
+                        {% for action in row.actions %}
+                        <form method="post" action="{{ action.url }}" data-confirm="{{ action.label }} this record?">
+                            {% csrf_token %}
+                            <button type="submit" class="mini-button {{ action.tone }}">{{ action.label }}</button>
+                        </form>
+                        {% endfor %}
+                        {% if row.edit_url %}<a href="{{ row.edit_url }}" class="mini-button">Edit</a>{% endif %}
+                        {% if row.delete_url %}<a href="{{ row.delete_url }}" class="mini-button bad">Delete</a>{% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{{ colspan }}" class="empty">
+                        {% if q %}Nothing matches "{{ q }}".{% else %}No records yet.{% if can_create %} Use Add new to create the first one.{% endif %}{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</section>
+{% endblock %}

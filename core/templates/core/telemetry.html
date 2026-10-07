@@ -1,0 +1,54 @@
+{% extends "core/base.html" %}
+
+{% block title %}Telemetry | StratosERP{% endblock %}
+
+{% block content %}
+<section class="page-section" data-autorefresh="15000">
+
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">Infrastructure</p>
+            <h2>Hardware telemetry</h2>
+            <p class="live-note"><span class="online-dot"></span>Live, refreshes every 15 seconds</p>
+        </div>
+        <div class="toolbar">
+            {% if can_edit.hardware %}
+            <a href="{% url 'hardware_list' %}" class="outline-button">Manage nodes</a>
+            <a href="{% url 'hardware_create' %}" class="primary-button">Add node</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="kpi-grid">
+        <div class="kpi"><strong>{{ node_count }}</strong><span>Registered nodes</span></div>
+        <div class="kpi"><strong>{{ active_nodes }}</strong><span>Online now</span></div>
+        <div class="kpi"><strong>{{ avg_cpu|floatformat:0 }}%</strong><span>Average CPU, online nodes</span></div>
+        <div class="kpi"><strong>{{ avg_memory|floatformat:0 }}%</strong><span>Average memory</span></div>
+        <div class="kpi"><strong>{{ avg_storage|floatformat:0 }}%</strong><span>Average storage</span></div>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>Node</th><th>IP address</th><th>Status</th><th>CPU</th><th>Memory</th><th>Storage</th><th>Last update</th></tr>
+            </thead>
+            <tbody>
+                {% for node in nodes %}
+                <tr>
+                    <td>{{ node.node_name }}</td>
+                    <td>{{ node.ip_address }}</td>
+                    <td><span class="badge {% if node.status == 'Online' %}good{% elif node.status == 'Offline' %}bad{% else %}warn{% endif %}">{{ node.status }}</span></td>
+                    <td><div class="meter"><div class="bar {% if node.cpu_usage >= 85 %}bad{% elif node.cpu_usage >= 65 %}warn{% endif %}"><span style="width: {{ node.cpu_usage|floatformat:0 }}%"></span></div><em>{{ node.cpu_usage|floatformat:0 }}%</em></div></td>
+                    <td><div class="meter"><div class="bar {% if node.memory_usage >= 85 %}bad{% elif node.memory_usage >= 65 %}warn{% endif %}"><span style="width: {{ node.memory_usage|floatformat:0 }}%"></span></div><em>{{ node.memory_usage|floatformat:0 }}%</em></div></td>
+                    <td><div class="meter"><div class="bar {% if node.storage_usage >= 85 %}bad{% elif node.storage_usage >= 65 %}warn{% endif %}"><span style="width: {{ node.storage_usage|floatformat:0 }}%"></span></div><em>{{ node.storage_usage|floatformat:0 }}%</em></div></td>
+                    <td>{% if node.last_seen %}{{ node.last_seen|timesince }} ago{% else %}—{% endif %}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="empty">No hardware nodes registered yet.{% if can_edit.hardware %} Use Add node to register one.{% endif %}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</section>
+{% endblock %}
