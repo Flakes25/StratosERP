@@ -20,6 +20,8 @@
         <div class="kpi"><strong>{{ active_assignments }}</strong><span>Assets currently assigned</span></div>
     </div>
 
+    {% include "core/_charts.html" %}
+
     <h3 class="block-title">Download as CSV</h3>
     <div class="toolbar export-row">
         {% for e in exports %}

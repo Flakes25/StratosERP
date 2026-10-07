@@ -1,0 +1,71 @@
+<div class="chart-grid">
+
+    {% if can_view.inventory %}
+    <div class="chart-card">
+        <h3>Stock by category</h3>
+        <p class="sub">Units on hand</p>
+        {% for b in stock_by_category %}
+        <div class="hbar"><span>{{ b.label }}</span><div class="track"><div class="fill" style="width: {{ b.pct }}%"></div></div><b>{{ b.value }}</b></div>
+        {% empty %}
+        <p class="chart-empty">No categories yet.</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if can_view.procurement %}
+    <div class="chart-card">
+        <h3>Purchase requests</h3>
+        <p class="sub">By status</p>
+        {% if request_segments %}
+        <div class="donut-wrap">
+            <svg class="donut" viewBox="0 0 36 36" role="img" aria-label="Purchase requests by status">
+                <circle class="ring" cx="18" cy="18" r="15.9155"/>
+                {% for s in request_segments %}
+                <circle class="seg-{{ s.tone }}" cx="18" cy="18" r="15.9155" stroke-dasharray="{{ s.dash }}" stroke-dashoffset="{{ s.offset }}"/>
+                {% endfor %}
+            </svg>
+            <ul class="legend">
+                {% for s in request_segments %}<li><i class="{{ s.tone }}"></i>{{ s.label }}: {{ s.count }}</li>{% endfor %}
+            </ul>
+        </div>
+        {% else %}
+        <p class="chart-empty">No purchase requests yet.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if can_view.movements %}
+    <div class="chart-card">
+        <h3>Stock movement</h3>
+        <p class="sub">Last 7 days <span class="key in">In</span> <span class="key out">Out</span></p>
+        {% if has_movement %}
+        <div class="cols">
+            {% for d in movement_days %}
+            <div class="col">
+                <div class="pair">
+                    <span class="in" style="height: {{ d.in_pct }}%" title="In: {{ d.stock_in }}"></span>
+                    <span class="out" style="height: {{ d.out_pct }}%" title="Out: {{ d.stock_out }}"></span>
+                </div>
+                <small>{{ d.label }}</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="chart-empty">No stock movement in the last 7 days.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if can_view.employees %}
+    <div class="chart-card">
+        <h3>Employees by department</h3>
+        <p class="sub">Headcount</p>
+        {% for b in staff_by_department %}
+        <div class="hbar"><span>{{ b.label }}</span><div class="track"><div class="fill" style="width: {{ b.pct }}%"></div></div><b>{{ b.value }}</b></div>
+        {% empty %}
+        <p class="chart-empty">No departments yet.</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>

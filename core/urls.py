@@ -15,6 +15,8 @@ urlpatterns = [
     # pages
     path("modules/", views.modules, name="modules"),
     path("telemetry/", views.telemetry, name="telemetry"),
+    path("api/telemetry/", views.api_telemetry, name="api_telemetry"),
+    path("employees/<int:pk>/", views.employee_detail, name="employee_detail"),
     path("reports/", views.reports, name="reports"),
 
     # actions

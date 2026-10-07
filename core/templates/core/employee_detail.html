@@ -1,0 +1,57 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ employee.full_name }} | StratosERP{% endblock %}
+
+{% block content %}
+<section class="page-section">
+
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">{{ employee.employee_id }}</p>
+            <h2>{{ employee.full_name }}</h2>
+        </div>
+        <div class="toolbar">
+            <a href="{% url 'employees_list' %}" class="outline-button">Back</a>
+            {% if can_edit.employees %}<a href="{% url 'employees_update' employee.pk %}" class="outline-button">Edit</a>{% endif %}
+            {% if can_edit.assignments %}<a href="{% url 'assignments_create' %}" class="primary-button">Assign asset</a>{% endif %}
+        </div>
+    </div>
+
+    <div class="kpi-grid">
+        <div class="kpi text"><strong>{{ employee.department|default:"—" }}</strong><span>Department</span></div>
+        <div class="kpi text"><strong>{{ employee.position|default:"—" }}</strong><span>Position</span></div>
+        <div class="kpi text"><strong>{{ employee.date_hired|date:"M d, Y" }}</strong><span>Date hired</span></div>
+        <div class="kpi text"><strong>{{ employee.email|default:"—" }}</strong><span>Email</span></div>
+        <div class="kpi"><strong>{{ items_held }}</strong><span>Units currently assigned</span></div>
+    </div>
+
+    <h3 class="block-title">Currently assigned</h3>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Item</th><th>SKU</th><th>Qty</th><th>Assigned</th></tr></thead>
+            <tbody>
+                {% for a in active %}
+                <tr><td>{{ a.item.name }}</td><td>{{ a.item.sku }}</td><td>{{ a.quantity }}</td><td>{{ a.assigned_at|date:"M d, Y" }}</td></tr>
+                {% empty %}
+                <tr><td colspan="4" class="empty">No equipment assigned.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h3 class="block-title">Assignment history</h3>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Item</th><th>Qty</th><th>Assigned</th><th>Returned</th></tr></thead>
+            <tbody>
+                {% for a in history %}
+                <tr><td>{{ a.item.name }}</td><td>{{ a.quantity }}</td><td>{{ a.assigned_at|date:"M d, Y" }}</td><td>{{ a.returned_at|date:"M d, Y" }}</td></tr>
+                {% empty %}
+                <tr><td colspan="4" class="empty">Nothing returned yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</section>
+{% endblock %}

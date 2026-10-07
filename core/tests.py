@@ -6,11 +6,15 @@ Run one class:  python manage.py test core.tests.ProcurementFlowTests
 """
 import csv
 import io
+import json
+from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.test import TestCase
+from django.core.management import call_command
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import (
     ActivityLog, AssetAssignment, Category, Department, Employee, HardwareNode,
@@ -483,3 +487,162 @@ class ReportTests(BaseTestCase):
         self.assertEqual(context["item_count"], 2)
         self.assertEqual(context["units_in_stock"], 11)
         self.assertEqual(len(context["low_stock"]), 1)
+
+
+# ---------------------------------------------------------------
+# Charts, recent transactions, profile, pagination
+# ---------------------------------------------------------------
+class ChartTests(BaseTestCase):
+    def dashboard(self, user=None):
+        self.login(user or self.inv)
+        return self.client.get(reverse("dashboard")).context
+
+    def test_stock_chart_is_scaled_to_the_largest_bar(self):
+        small = Category.objects.create(name="Small")
+        InventoryItem.objects.create(name="Cable", sku="C-1", category=small, quantity=5, reorder_level=1)
+        bars = {b["label"]: b for b in self.dashboard()["stock_by_category"]}
+        self.assertEqual(bars["Hardware"]["pct"], 100)
+        self.assertEqual(bars["Small"]["pct"], 50)
+
+    def test_request_donut_segments(self):
+        for status in ("Pending", "Pending", "Approved"):
+            PurchaseRequest.objects.create(item=self.item, quantity=1, requested_by=self.mgr, status=status)
+        segments = self.dashboard()["request_segments"]
+        self.assertEqual([s["label"] for s in segments], ["Pending", "Approved"])
+        self.assertEqual(segments[0]["dash"], "66.67 33.33")
+        self.assertEqual(segments[1]["offset"], "-66.67")
+
+    def test_no_requests_gives_no_segments(self):
+        self.assertEqual(self.dashboard()["request_segments"], [])
+
+    def test_movement_chart_covers_seven_days_and_includes_today(self):
+        AssetAssignment.assign(self.item, self.emp, 4)
+        context = self.dashboard()
+        self.assertEqual(len(context["movement_days"]), 7)
+        today = context["movement_days"][-1]
+        self.assertEqual((today["stock_out"], today["out_pct"]), (4, 100))
+        self.assertTrue(context["has_movement"])
+
+    def test_recent_transactions_on_dashboard(self):
+        AssetAssignment.assign(self.item, self.emp, 1)
+        context = self.dashboard()
+        self.assertEqual(len(context["recent_movements"]), 1)
+
+    def test_charts_respect_role(self):
+        self.login(self.hr)
+        html = self.client.get(reverse("dashboard")).content.decode()
+        self.assertIn("Employees by department", html)
+        self.assertNotIn("Stock by category", html)
+
+    def test_reports_page_shows_charts(self):
+        self.login(self.admin)
+        self.assertContains(self.client.get(reverse("reports")), "Stock by category")
+
+
+class EmployeeProfileTests(BaseTestCase):
+    def test_profile_shows_assigned_equipment(self):
+        AssetAssignment.assign(self.item, self.emp, 2)
+        returned = AssetAssignment.assign(self.item, self.emp, 1)
+        returned.return_asset()
+        self.login(self.hr)
+        response = self.client.get(reverse("employee_detail", args=[self.emp.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["active"]), 1)
+        self.assertEqual(len(response.context["history"]), 1)
+        self.assertEqual(response.context["items_held"], 2)
+
+    def test_inventory_staff_cannot_open_profiles(self):
+        self.login(self.inv)
+        self.assertEqual(self.client.get(reverse("employee_detail", args=[self.emp.pk])).status_code, 403)
+
+    def test_employee_list_links_to_profile(self):
+        self.login(self.hr)
+        actions = self.client.get(reverse("employees_list")).context["rows"][0]["actions"]
+        self.assertEqual(actions[0]["url"], reverse("employee_detail", args=[self.emp.pk]))
+
+
+class PaginationTests(BaseTestCase):
+    def test_lists_are_paged_at_25(self):
+        for i in range(30):
+            InventoryItem.objects.create(name=f"Item {i}", sku=f"P-{i}", quantity=1, reorder_level=0)
+        self.login(self.inv)
+        first = self.client.get(reverse("inventory_list"))
+        self.assertEqual(len(first.context["rows"]), 25)
+        second = self.client.get(reverse("inventory_list"), {"page": 2})
+        self.assertEqual(len(second.context["rows"]), 6)  # 30 + the Laptop = 31
+
+    def test_bad_page_number_falls_back_gracefully(self):
+        self.login(self.inv)
+        self.assertEqual(self.client.get(reverse("inventory_list"), {"page": "abc"}).status_code, 200)
+
+
+# ---------------------------------------------------------------
+# Telemetry intake API and stale-node command
+# ---------------------------------------------------------------
+@override_settings(TELEMETRY_API_KEY="secret-key")
+class TelemetryApiTests(BaseTestCase):
+    GOOD = {"node_name": "agent-1", "ip_address": "10.1.1.5",
+            "cpu_usage": 42.5, "memory_usage": 60, "storage_usage": 70}
+
+    def post(self, payload, key="secret-key", raw=None):
+        headers = {"HTTP_X_API_KEY": key} if key is not None else {}
+        body = raw if raw is not None else json.dumps(payload)
+        return self.client.post(reverse("api_telemetry"), data=body, content_type="application/json", **headers)
+
+    def test_missing_key_is_rejected(self):
+        self.assertEqual(self.post(self.GOOD, key=None).status_code, 403)
+
+    def test_wrong_key_is_rejected(self):
+        self.assertEqual(self.post(self.GOOD, key="nope").status_code, 403)
+
+    def test_api_is_disabled_when_no_key_is_configured(self):
+        with self.settings(TELEMETRY_API_KEY=""):
+            self.assertEqual(self.post(self.GOOD, key="").status_code, 403)
+
+    def test_get_is_not_allowed(self):
+        self.assertEqual(self.client.get(reverse("api_telemetry")).status_code, 405)
+
+    def test_creates_a_node(self):
+        response = self.post(self.GOOD)
+        self.assertEqual(response.status_code, 201)
+        node = HardwareNode.objects.get(node_name="agent-1")
+        self.assertEqual((node.cpu_usage, node.status), (42.5, "Online"))
+
+    def test_second_report_updates_instead_of_duplicating(self):
+        self.post(self.GOOD)
+        response = self.post(dict(self.GOOD, cpu_usage=80))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(HardwareNode.objects.filter(node_name="agent-1").count(), 1)
+        self.assertEqual(HardwareNode.objects.get(node_name="agent-1").cpu_usage, 80)
+
+    def test_invalid_input_is_rejected(self):
+        cases = [
+            dict(self.GOOD, cpu_usage=150),
+            dict(self.GOOD, ip_address="not-an-ip"),
+            dict(self.GOOD, status="Exploded"),
+            dict(self.GOOD, node_name="  "),
+            {"ip_address": "10.0.0.1"},
+        ]
+        for payload in cases:
+            with self.subTest(payload=payload):
+                self.assertEqual(self.post(payload).status_code, 400)
+        self.assertEqual(self.post(None, raw="not json").status_code, 400)
+        self.assertEqual(HardwareNode.objects.count(), 0)
+
+    def test_reported_node_appears_on_the_dashboard(self):
+        self.post(self.GOOD)
+        self.login(self.inv)
+        context = self.client.get(reverse("dashboard")).context
+        self.assertEqual(context["active_nodes"], 1)
+        self.assertEqual(context["avg_cpu"], 42.5)
+
+
+class StaleNodeCommandTests(BaseTestCase):
+    def test_old_online_nodes_go_offline_and_fresh_ones_stay(self):
+        old = HardwareNode.objects.create(node_name="old", ip_address="10.0.0.1")
+        fresh = HardwareNode.objects.create(node_name="fresh", ip_address="10.0.0.2")
+        HardwareNode.objects.filter(pk=old.pk).update(last_seen=timezone.now() - timedelta(minutes=10))
+        call_command("mark_stale_nodes", "--minutes", "2", stdout=io.StringIO())
+        old.refresh_from_db(); fresh.refresh_from_db()
+        self.assertEqual(old.status, "Offline")
+        self.assertEqual(fresh.status, "Online")

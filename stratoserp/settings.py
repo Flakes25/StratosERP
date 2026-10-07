@@ -128,3 +128,6 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+TELEMETRY_API_KEY = "test123"
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

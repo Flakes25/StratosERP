@@ -39,10 +39,14 @@
                     {% endfor %}
                     <td class="row-actions">
                         {% for action in row.actions %}
+                        {% if action.get %}
+                        <a href="{{ action.url }}" class="mini-button">{{ action.label }}</a>
+                        {% else %}
                         <form method="post" action="{{ action.url }}" data-confirm="{{ action.label }} this record?">
                             {% csrf_token %}
                             <button type="submit" class="mini-button {{ action.tone }}">{{ action.label }}</button>
                         </form>
+                        {% endif %}
                         {% endfor %}
                         {% if row.edit_url %}<a href="{{ row.edit_url }}" class="mini-button">Edit</a>{% endif %}
                         {% if row.delete_url %}<a href="{{ row.delete_url }}" class="mini-button bad">Delete</a>{% endif %}
@@ -58,6 +62,14 @@
             </tbody>
         </table>
     </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="pager">
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_previous %}<a class="mini-button" href="?{% if q %}q={{ q|urlencode }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+        {% if page_obj.has_next %}<a class="mini-button" href="?{% if q %}q={{ q|urlencode }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+    </div>
+    {% endif %}
 
 </section>
 {% endblock %}
