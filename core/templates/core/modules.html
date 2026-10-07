@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+
+{% block title %}All modules | StratosERP{% endblock %}
+
+{% block content %}
+<section class="page-section">
+
+    <div class="page-heading">
+        <div><h2>All modules</h2></div>
+    </div>
+
+    <div class="module-grid">
+        {% for m in modules %}
+        <div class="module-tile">
+            <h3>{{ m.label }}</h3>
+            <p>{{ m.desc }}</p>
+            <div class="tile-links">
+                <a href="{{ m.url }}" class="mini-button">Open</a>
+                {% if m.add_url %}<a href="{{ m.add_url }}" class="mini-button good">Add new</a>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</section>
+{% endblock %}

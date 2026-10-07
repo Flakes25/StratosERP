@@ -1,0 +1,89 @@
+{% extends "core/base.html" %}
+
+{% block title %}Reports | StratosERP{% endblock %}
+
+{% block content %}
+<section class="page-section">
+
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">Analytics</p>
+            <h2>Reports</h2>
+        </div>
+    </div>
+
+    <div class="kpi-grid">
+        <div class="kpi"><strong>{{ item_count }}</strong><span>Inventory items</span></div>
+        <div class="kpi"><strong>{{ units_in_stock }}</strong><span>Units in stock</span></div>
+        <div class="kpi"><strong>{{ low_stock|length }}</strong><span>Items at or below reorder level</span></div>
+        <div class="kpi"><strong>{{ pending_requests }}</strong><span>Purchase requests pending</span></div>
+        <div class="kpi"><strong>{{ active_assignments }}</strong><span>Assets currently assigned</span></div>
+    </div>
+
+    {% include "core/_charts.html" %}
+
+    <h3 class="block-title">Download as CSV</h3>
+    <div class="toolbar export-row">
+        {% for e in exports %}
+            {% if e.module == 'inventory' and can_view.inventory or e.module == 'procurement' and can_view.procurement or e.module == 'employees' and can_view.employees or e.module == 'assignments' and can_view.assignments %}
+            <a href="{% url e.url %}" class="outline-button">{{ e.label }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="report-columns">
+
+        <div>
+            <h3 class="block-title">Low-stock alerts</h3>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>Item</th><th>Category</th><th>Qty</th><th>Reorder at</th></tr></thead>
+                    <tbody>
+                        {% for i in low_stock %}
+                        <tr><td>{{ i.name }}</td><td>{{ i.category|default:"—" }}</td><td><span class="badge bad">{{ i.quantity }}</span></td><td>{{ i.reorder_level }}</td></tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="empty">Every item is above its reorder level.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="block-title">Stock by category</h3>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>Category</th><th>Items</th><th>Units</th></tr></thead>
+                    <tbody>
+                        {% for c in by_category %}
+                        <tr><td>{{ c.name }}</td><td>{{ c.items_n }}</td><td>{{ c.units|default:0 }}</td></tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="empty">No categories yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if can_view.employees %}
+        <div>
+            <h3 class="block-title">Employees by department</h3>
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>Department</th><th>Employees</th></tr></thead>
+                    <tbody>
+                        {% for d in by_department %}
+                        <tr><td>{{ d.name }}</td><td>{{ d.people }}</td></tr>
+                        {% empty %}
+                        <tr><td colspan="2" class="empty">No departments yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+</section>
+{% endblock %}

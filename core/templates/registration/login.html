@@ -1,0 +1,32 @@
+{% extends "core/base.html" %}
+
+{% block title %}Log in | StratosERP{% endblock %}
+{% block main_class %}login-wrap{% endblock %}
+
+{% block content %}
+<form method="post" class="form-card login-card">
+    {% csrf_token %}
+    <p class="eyebrow">Enterprise resource platform</p>
+    <h2>Log in to StratosERP</h2>
+
+    {% if form.errors %}
+    <div class="form-error">That username and password don't match. Check both and try again.</div>
+    {% endif %}
+
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+    <div class="field">
+        <label for="id_username">Username</label>
+        <input type="text" name="username" id="id_username" class="form-control" autofocus autocomplete="username" required>
+    </div>
+    <div class="field">
+        <label for="id_password">Password</label>
+        <input type="password" name="password" id="id_password" class="form-control" autocomplete="current-password" required>
+    </div>
+    <label class="show-pass"><input type="checkbox" id="show-pass"> Show password</label>
+
+    <div class="form-actions">
+        <button type="submit" class="primary-button">Log in</button>
+    </div>
+</form>
+{% endblock %}

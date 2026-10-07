@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "core.context_processors.roles",
             ],
         },
     },
@@ -127,3 +128,6 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+TELEMETRY_API_KEY = "test123"
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

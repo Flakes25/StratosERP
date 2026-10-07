@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+
+{% block title %}No access | StratosERP{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">Error 403</p>
+            <h2>You don't have access to this page</h2>
+        </div>
+    </div>
+    <div class="form-card">
+        <p>Your role{% if user_roles %} ({{ user_roles|join:", " }}){% endif %} isn't allowed to open this module. Ask an administrator if you need access.</p>
+        <div class="form-actions">
+            <a href="{% url 'dashboard' %}" class="primary-button">Back to dashboard</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
